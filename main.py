@@ -10037,7 +10037,7 @@ async def add_admin_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
     arg = context.args[0].strip()
     
     if arg.startswith("@"):
-        uname = arg.nstrip("@").lower()
+        uname = arg.lstrip("@").lower()
         if uname in admins_data.get("usernames", []):
             await update.message.reply_text(f"✅ User {arg} is already an admin.")
             return
