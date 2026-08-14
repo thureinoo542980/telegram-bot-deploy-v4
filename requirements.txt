@@ -1,0 +1,12 @@
+python-telegram-bot[job-queue]>=20.0
+requests
+yt-dlp
+aiohttp
+geopy
+psutil
+flask
+gunicorn
+gTTS
+beautifulsoup4
+pyrogram
+tgcrypto

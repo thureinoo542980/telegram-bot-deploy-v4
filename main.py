@@ -13,6 +13,9 @@ import re
 import html
 import requests
 import time
+import os
+import threading
+from flask import Flask
 from collections import Counter
 from telegram import InputMediaPhoto, MessageEntity
 from urllib.parse import urlparse
@@ -47,6 +50,20 @@ from telegram.ext import (
     ChatMemberHandler,
     CallbackQueryHandler,
 )
+
+# Flask server to keep Render alive
+flask_app = Flask(__name__)
+
+@flask_app.route('/')
+def home():
+    return "Drake Bot is Alive!"
+
+def run_flask():
+    port = int(os.environ.get('PORT', 8080))
+    flask_app.run(host='0.0.0.0', port=port)
+
+# Start Flask in a background thread
+threading.Thread(target=run_flask, daemon=True).start()
 
 # Custom Emoji Map (Placeholder - User needs to populate with actual IDs)
 DATA_DIR = "data"
