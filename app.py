@@ -1,6 +1,5 @@
 import os
 import threading
-import asyncio
 import gradio as gr
 from main import main as run_bot
 
@@ -16,8 +15,8 @@ def start_bot():
 bot_thread = threading.Thread(target=start_bot, daemon=True)
 bot_thread.start()
 
-# Define a simple Gradio interface to keep the Space alive
-def greet(name):
+# Define a simple Gradio interface to keep the Space alive and provide a health check
+def greet(name="User"):
     return f"Drake Bot is running! Hello {name}."
 
 iface = gr.Interface(
@@ -25,8 +24,11 @@ iface = gr.Interface(
     inputs="text", 
     outputs="text",
     title="Drake Telegram Bot",
-    description="This space hosts the Drake Telegram Bot. The bot runs in the background."
+    description="This service hosts the Drake Telegram Bot. The bot runs in the background."
 )
 
 if __name__ == "__main__":
-    iface.launch(server_name="0.0.0.0", server_port=7860)
+    # Koyeb and other platforms use the PORT environment variable
+    port = int(os.environ.get("PORT", 8080))
+    print(f"Starting Gradio server on port {port}")
+    iface.launch(server_name="0.0.0.0", server_port=port)
