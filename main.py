@@ -5412,7 +5412,7 @@ async def start_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
         [InlineKeyboardButton("💡 𝐇𝐞𝐥𝐩", callback_data="start_about")],
         [
             InlineKeyboardButton("✈ 𝐒𝐮𝐩𝐩𝐨𝐫𝐭", url="https://t.me/GoldemSnow_Family"),
-            InlineKeyboardButton("📢 𝐂𝐡𝐚𝐧𝐧ెʟ" if False else "📢 𝐂𝐡𝐚𝐧𝐧𝐞𝐥", url="https://t.me/drake_botpre")
+            InlineKeyboardButton("📢 𝐂𝐡𝐚𝐧𝐧𝐞𝐥", url="https://t.me/drake_botpre")
         ]
     ])
     sample_banner_url = os.getenv("START_BANNER_URL", "https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?q=80&w=1000&auto=format&fit=crop")
