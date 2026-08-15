@@ -5405,14 +5405,14 @@ async def start_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
         f"<blockquote>⚡ <b>𝐀𝐔𝐓𝐎𝐏𝐋𝐀𝐘 • 𝐀𝐃𝐌𝐈𝐍 𝐓𝐎𝐆𝐆𝐋𝐄.</b>\n"
         f"🛡 <b>𝐍𝐎 𝐀𝐃𝐒 • 𝟐𝟒/𝟕 𝐔𝐏𝐓𝐈𝐌𝐄.</b> 🔘 <b>𝐅𝐀𝐒𝐓</b>\n"
         f"🚀 <b>𝐋𝐀𝐆-𝐅𝐑𝐄𝐄.</b> 🎙 <b>𝐏𝐋𝐀𝐘 𝐀𝐔𝐃𝐈𝐎, 𝐕𝐈𝐃𝐄𝐎 & 𝐓𝐆 𝐅𝐈𝐋𝐄𝐒.</b></blockquote>\n\n"
-        f"<i>✨ 𝓐𝓓𝓓 𝓜𝓔 𝓝𝓞𝓦 𝓘𝓝 𝓨𝓞𝓤𝓡 𝓖𝓡𝓞𝓤𝓟 & 𝓔𝓝𝓩𝓞𝓨 𝓗𝓘𝓖𝓗 𝓠𝓤𝓐𝓛𝓘𝓣𝓨 𝓒𝓞𝓝𝓣𝓡𝓞𝓛 💎</i> ... {mention}"
+        f"<i>✨ 𝓐𝓓𝓓 𝓜𝓔 𝓝𝓞𝓦 𝓘𝓝 𝓨𝓞𝓤𝓡 𝓖𝓡𝓞𝓤𝓟 & 𝓔𝓝𝓩𝓞𝓨 𝓗𝓘𝓖𝓗 𝓠𝓤𝓐𝓛𝓘𝓣𝓨 𝓜𝓤𝓢𝐈𝐂 💎</i> ... {mention}"
     )
     keyboard = InlineKeyboardMarkup([
-        [InlineKeyboardButton("🕹 𝐀𝐝𝐝 𝐦𝐞 𝐭𝐨 your 𝐆𝐫𝐨𝐮𝐩", url=f"https://t.me/{CrucialXNgaZenBot}?startgroup=true")],
-        [InlineKeyboardButton("📜 𝐇𝐞𝐥𝐩 & 𝐂𝐨ｍｍ𝐚𝐧𝐝𝐬", callback_data="start_about")],
+        [InlineKeyboardButton("🎨 𝐀𝐝𝐝 𝐦𝐞 𝐭𝐨 𝐲𝐨𝐮𝐫 𝐆𝐫𝐨𝐮𝐩", url=f"https://t.me/{CrucialXNgaZenBot}?startgroup=true")],
+        [InlineKeyboardButton("💡 𝐇𝐞𝐥𝐩", callback_data="start_about")],
         [
             InlineKeyboardButton("✈ 𝐒𝐮𝐩𝐩𝐨𝐫𝐭", url="https://t.me/GoldemSnow_Family"),
-            InlineKeyboardButton("📢 𝐂𝐡𝐚𝐧𝐧𝐞𝐥", url="https://t.me/drake_botpre")
+            InlineKeyboardButton("📢 𝐂𝐡𝐚𝐧𝐧ెʟ" if False else "📢 𝐂𝐡𝐚𝐧𝐧𝐞𝐥", url="https://t.me/drake_botpre")
         ]
     ])
     sample_banner_url = os.getenv("START_BANNER_URL", "https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?q=80&w=1000&auto=format&fit=crop")
