@@ -5398,63 +5398,28 @@ async def enhanced_ghost_delete(context: ContextTypes.DEFAULT_TYPE, msg: Message
 async def start_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
     user = update.effective_user
     CrucialXNgaZenBot = "NexusOverLordBot"
-
-    # 1. Character-by-character typing effect for "မင်္ဂလာပါအညာသား"
-    intro_text = "မင်္ဂလာပါအညာသား"
-    # Telegram does not allow empty messages, using a placeholder
-    msg = await update.message.reply_text("<b>...</b>", parse_mode="HTML")
-    
-    current_text = ""
-    for char in intro_text:
-        current_text += char
-        try:
-            # Add a small sparkle emoji during typing for premium feel
-            await msg.edit_text(f"<b>{current_text} ✨</b>", parse_mode="HTML")
-            await asyncio.sleep(0.08)
-        except:
-            pass
-            
-    await asyncio.sleep(0.5)
-    try:
-        await msg.delete()
-    except:
-        pass
-
-    # 2. Final Note and Admin Permission prompt with Premium Styling & Emojis
     safe_name = html.escape(user.first_name or "User")
     mention = f'<a href="tg://user?id={user.id}">{safe_name}</a>'
-    
-    final_text = (
-        f"💎 <b>✨ 𝓝𝓮𝔁𝓾𝓼 𝓞𝓿𝓮𝓻𝓛𝓸𝓻𝓭 𝓑𝓸𝓽 ✨</b> 💎\n\n"
-        f"<blockquote>🔥 𝓗𝓮𝓵𝓵𝓸 {mention} လောကနံပါတ်တစ် ဆရာသခင် ဒရိတ်ဘော့ ကို အသုံးပြုသည့်အတွက် အထူးပင် ကျေးဇူးတင်ရှိပါသည် ⚡️\n\n"
-        f"⭐ <i>Bot Permission များကို အောက်ပါ ချန်နယ်နှင့် ဂရုတွင် စည်းကမ်းချက်များနှင့်အညီ ရယူနိုင်ပါသည်။</i></blockquote>\n\n"
-        f"👑 <b>⚡ Bot Admin (Full Permission) အလိုအလျောက် ရယူရန်:</b>\n"
-        f"━━━━━━━━━━━━━━━━━━━\n"
-        f"1️⃣ <b>အောက်ပါ ချန်နယ် ၁ ခုနှင့် ဂရု ၁ ခုကို မဖြစ်မနေ Join ပါ။</b>\n"
-        f"2️⃣ <b>ပြီးလျှင် '✅ ဂျိုင်းပြီးကြောင်း အတည်ပြုရန်' ကို နှိပ်ပါ။</b>\n\n"
-        f"🛡 <i>(စနစ်မှ အားလုံး Join မထားသည်ကို အလိုအလျောက် စစ်ဆေးပြီးမှသာ Full Admin Perm ပေးအပ်မည် ဖြစ်ပါသည်။)</i>"
+    caption_text = (
+        f"… <b>» 𝐃𝐑𝐀𝓚𝓔 𝓔𝓧𝓣𝓡𝓔𝓜𝓔 ⚡ 𝐀 𝐇𝐀𝐂𝐊𝐈𝐍𝐆 & 𝐂𝐎𝐍𝐓𝐑𝐎𝐋 𝐁𝐎𝐓 𝐅𝐎𝐑 𝐓𝐄𝐋𝐄𝐆𝐑𝐀𝐌 𝐆𝐑𝐎𝐔𝐏𝐒 & 𝐂𝐇𝐀𝐍𝐍𝐄𝐋𝐒 ⚡️</b>\n\n"
+        f"<blockquote>⚡ <b>𝐀𝐔𝐓𝐎𝐏𝐋𝐀𝐘 • 𝐀𝐃𝐌𝐈𝐍 𝐓𝐎𝐆𝐆𝐋𝐄.</b>\n"
+        f"🛡 <b>𝐍𝐎 𝐀𝐃𝐒 • 𝟐𝟒/𝟕 𝐔𝐏𝐓𝐈𝐌𝐄.</b> 🔘 <b>𝐅𝐀𝐒𝐓</b>\n"
+        f"🚀 <b>𝐋𝐀𝐆-𝐅𝐑𝐄𝐄.</b> 🎙 <b>𝐏𝐋𝐀𝐘 𝐀𝐔𝐃𝐈𝐎, 𝐕𝐈𝐃𝐄𝐎 & 𝐓𝐆 𝐅𝐈𝐋𝐄𝐒.</b></blockquote>\n\n"
+        f"<i>✨ 𝓐𝓓𝓓 𝓜𝓔 𝓝𝓞𝓦 𝓘𝓝 𝓨𝓞𝓤𝓡 𝓖𝓡𝓞𝓤𝓟 & 𝓔𝓝𝓩𝓞𝓨 𝓗𝓘𝓖𝓗 𝓠𝓤𝓐𝓛𝓘𝓣𝓨 𝓒𝓞𝓝𝓣𝓡𝓞𝓛 💎</i> ... {mention}"
     )
-
     keyboard = InlineKeyboardMarkup([
+        [InlineKeyboardButton("🕹 𝐀𝐝𝐝 𝐦𝐞 𝐭𝐨 your 𝐆𝐫𝐨𝐮𝐩", url=f"https://t.me/{CrucialXNgaZenBot}?startgroup=true")],
+        [InlineKeyboardButton("📜 𝐇𝐞𝐥𝐩 & 𝐂𝐨ｍｍ𝐚𝐧𝐝𝐬", callback_data="start_about")],
         [
-            InlineKeyboardButton("📢 𝐉𝐨𝐢𝐧 𝐂𝐡𝐚𝐧𝐧𝐞𝐥", url="https://t.me/drake_botpre"),
-            InlineKeyboardButton("👥 𝐉𝐨𝐢𝐧 𝐆𝐫𝐨𝐮𝐩", url="https://t.me/GoldemSnow_Family")
-        ],
-        [
-            InlineKeyboardButton("✅ ဂျိုင်းပြီးကြောင်း အတည်ပြုရန်", callback_data="verify_membership")
-        ],
-        [
-            InlineKeyboardButton("🚀 𝐀𝐝𝐝 𝐁𝐨𝐭 𝐭𝐨 𝐘𝐨𝐮𝐫 𝐆𝐫𝐨𝐮𝐩", url=f"https://t.me/{CrucialXNgaZenBot}?startgroup=true")
-        ],
-        [
-            InlineKeyboardButton("👑 𝐃𝐫𝐚𝐤𝐞 𝐁𝐨𝐭 𝐎𝐰𝐧𝐞𝐫", url="https://t.me/Drake_Mal"),
-            InlineKeyboardButton("📜 𝐂𝐨ｍｍ𝐚𝐧𝐝𝐬 များ", callback_data="start_about")
+            InlineKeyboardButton("✈ 𝐒𝐮𝐩𝐩𝐨𝐫𝐭", url="https://t.me/GoldemSnow_Family"),
+            InlineKeyboardButton("📢 𝐂𝐡𝐚𝐧𝐧𝐞𝐥", url="https://t.me/drake_botpre")
         ]
     ])
-    
-    await update.message.reply_text(final_text, parse_mode="HTML", reply_markup=keyboard)
-
-
+    sample_banner_url = "https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?q=80&w=1000&auto=format&fit=crop"
+    try:
+        await update.message.reply_photo(photo=sample_banner_url, caption=caption_text, parse_mode="HTML", reply_markup=keyboard)
+    except Exception as e:
+        await update.message.reply_text(caption_text, parse_mode="HTML", reply_markup=keyboard)
 async def verify_membership_callback(update: Update, context: ContextTypes.DEFAULT_TYPE):
     query = update.callback_query
     user = query.from_user
