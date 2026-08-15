@@ -8686,26 +8686,30 @@ async def fastspam_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
     )
 
 async def stop_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
-    if await check_lock_and_notify(update, context, "stop"):
-        return
-    
-    user = update.effective_user
-    if not is_authorized(user) and not check_limited_command(user.id, "stop"):
-        await handle_unauthorized_access(update, context, "/stop")
-        await update.message.reply_text("မင်းမှာခွင့်ပြုချက်မရှိဘူးဖာသယ်မသား")
-        return
-
-    chat = update.effective_chat
-    if chat.id in attacking_single:
-        attacking_single.pop(chat.id, None)
-        attacking_single_display.pop(chat.id, None)
-        t = attack_tasks.get(("single", chat.id))
-        if t and not t.done():
-            try: t.cancel()
+    try:
+        if await check_lock_and_notify(update, context, "stop"):
+            return
+        user = update.effective_user
+        if user and not is_authorized(user) and not check_limited_command(user.id, "stop"):
+            await handle_unauthorized_access(update, context, "/stop")
+            await update.message.reply_text("မင်းမှာခွင့်ပြုချက်မရှိဘူးဖာသယ်မသား")
+            return
+        chat = update.effective_chat
+        if chat and chat.id in attacking_single:
+            attacking_single.pop(chat.id, None)
+            attacking_single_display.pop(chat.id, None)
+            t = attack_tasks.get(("single", chat.id))
+            if t and not t.done():
+                try: t.cancel()
+                except: pass
+                attack_tasks.pop(("single", chat.id), None)
+        if update.message:
+            await update.message.reply_text("ခွေးမသားအားလုံးငြိမ်းချမ်းစေ")
+    except Exception as e:
+        print(f"Error in stop_command: {e}")
+        if update.message:
+            try: await update.message.reply_text(f"⚠️ Stop error: {e}")
             except: pass
-            attack_tasks.pop(("single", chat.id), None)
-    await update.message.reply_text("ခွေးမသားအားလုံးငြိမ်းချမ်းစေ")
-
 async def stopmultiple_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
     if await check_lock_and_notify(update, context, "stopmultiple"):
         return
@@ -8728,58 +8732,55 @@ async def stopmultiple_command(update: Update, context: ContextTypes.DEFAULT_TYP
     await update.message.reply_text("ခွေးမသားအားလုံးငြိမ်းချမ်းစေ")
 
 async def stopall_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
-    if await check_lock_and_notify(update, context, "stopall"):
-        return
-    
-    user = update.effective_user
-    if not is_authorized(user) and not check_limited_command(user.id, "stopall"):
-        await handle_unauthorized_access(update, context, "/stopall")
-        await update.message.reply_text("မင်းမှာခွင့်ပြုချက်မရှိဘူးဖာသယ်မသား")
-        return
-
-    chat = update.effective_chat
-    
-    # Stop SMART attacks
-    if chat.id in smart_attacks:
-        smart_attacks.pop(chat.id, None)
-        t = attack_tasks.get(("smart", chat.id))
-        if t and not t.done():
-            try: t.cancel()
+    try:
+        if await check_lock_and_notify(update, context, "stopall"):
+            return
+        user = update.effective_user
+        if user and not is_authorized(user) and not check_limited_command(user.id, "stopall"):
+            await handle_unauthorized_access(update, context, "/stopall")
+            await update.message.reply_text("မင်းမှာခွင့်ပြုချက်မရှိဘူးဖာသယ်မသား")
+            return
+        chat = update.effective_chat
+        if chat:
+            if chat.id in smart_attacks:
+                smart_attacks.pop(chat.id, None)
+                t = attack_tasks.get(("smart", chat.id))
+                if t and not t.done():
+                    try: t.cancel()
+                    except: pass
+                    attack_tasks.pop(("smart", chat.id), None)
+            if chat.id in attacking_single:
+                attacking_single.pop(chat.id, None)
+                attacking_single_display.pop(chat.id, None)
+                t = attack_tasks.get(("single", chat.id))
+                if t and not t.done():
+                    try: t.cancel()
+                    except: pass
+                    attack_tasks.pop(("single", chat.id), None)
+            if chat.id in attacking_multiple:
+                attacking_multiple.pop(chat.id, None)
+                attacking_multiple_displays.pop(chat.id, None)
+                t = attack_tasks.get(("multiple", chat.id))
+                if t and not t.done():
+                    try: t.cancel()
+                    except: pass
+                    attack_tasks.pop(("multiple", chat.id), None)
+            ghost_map.pop(chat.id, None)
+            troll_map.pop(chat.id, None)
+            cfg = die_configs.get(str(chat.id))
+            if cfg:
+                cfg["active"] = False
+                die_configs[str(chat.id)] = cfg
+                try: asyncio.create_task(fast_data.buffered_save(DIE_FILE, die_configs))
+                except: pass
+            combo_states.pop(chat.id, None)
+        if update.message:
+            await update.message.reply_text("ခွေးမသားအားလုံးငြိမ်းချမ်းစေ")
+    except Exception as e:
+        print(f"Error in stopall_command: {e}")
+        if update.message:
+            try: await update.message.reply_text(f"⚠️ Stopall error: {e}")
             except: pass
-            attack_tasks.pop(("smart", chat.id), None)
-    
-    # Stop single attacks (your existing code)
-    if chat.id in attacking_single: 
-        attacking_single.pop(chat.id, None)
-        attacking_single_display.pop(chat.id, None)
-        t = attack_tasks.get(("single", chat.id))
-        if t and not t.done():
-            try: t.cancel()
-            except: pass
-            attack_tasks.pop(("single", chat.id), None)
-    
-    # Stop multiple attacks (your existing code)
-    if chat.id in attacking_multiple: 
-        attacking_multiple.pop(chat.id, None)
-        attacking_multiple_displays.pop(chat.id, None)
-        t = attack_tasks.get(("multiple", chat.id))
-        if t and not t.done():
-            try: t.cancel()
-            except: pass
-            attack_tasks.pop(("multiple", chat.id), None)
-    
-    # Your existing ghost, troll, die_config cleanup...
-    ghost_map.pop(chat.id, None)
-    troll_map.pop(chat.id, None)
-    cfg = die_configs.get(str(chat.id))
-    if cfg:
-        cfg["active"] = False
-        die_configs[str(chat.id)] = cfg
-        asyncio.create_task(fast_data.buffered_save(DIE_FILE, die_configs))
-    combo_states.pop(chat.id, None)
-    
-    await update.message.reply_text("ခွေးမသားအားလုံးငြိမ်းချမ်းစေ")
-
 async def quickattack_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
     """Quick attack last target - /qa or /quickattack"""
     if await check_lock_and_notify(update, context, "quickattack"):
