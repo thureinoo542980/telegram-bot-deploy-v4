@@ -5415,7 +5415,7 @@ async def start_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
             InlineKeyboardButton("📢 𝐂𝐡𝐚𝐧𝐧𝐞𝐥", url="https://t.me/drake_botpre")
         ]
     ])
-    sample_banner_url = "https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?q=80&w=1000&auto=format&fit=crop"
+    sample_banner_url = os.getenv("START_BANNER_URL", "https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?q=80&w=1000&auto=format&fit=crop")
     try:
         await update.message.reply_photo(photo=sample_banner_url, caption=caption_text, parse_mode="HTML", reply_markup=keyboard)
     except Exception as e:
