@@ -5401,7 +5401,7 @@ async def start_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
     safe_name = html.escape(user.first_name or "User")
     mention = f'<a href="tg://user?id={user.id}">{safe_name}</a>'
     caption_text = (
-        f"… <b>» 𝐃𝐑𝐀𝓚𝓔 𝓔𝓧𝓣𝓡𝓔𝓜𝓔 ⚡ 𝐀 𝐇𝐀𝐂𝐊𝐈𝐍𝐆 & 𝐂𝐎𝐍𝐓𝐑𝐎𝐋 𝐁𝐎𝐓 𝐅𝐎𝐑 𝐓𝐄𝐋𝐄𝐆𝐑𝐀𝐌 𝐆𝐑𝐎𝐔𝐏𝐒 & 𝐂𝐇𝐀𝐍𝐍𝐄𝐋𝐒 ⚡️</b>\n\n"
+        f"… <b>» 𝓓𝓡𝓐𝓚𝓔 𝓔𝓧𝓣𝓡𝓔𝓜𝓔 ⚡ 𝓐 MUSIC & CONTROL BOT FOR TELEGRAM GROUPS & CHANNELS ⚡️</b>\n\n"
         f"<blockquote>⚡ <b>𝐀𝐔𝐓𝐎𝐏𝐋𝐀𝐘 • 𝐀𝐃𝐌𝐈𝐍 𝐓𝐎𝐆𝐆𝐋𝐄.</b>\n"
         f"🛡 <b>𝐍𝐎 𝐀𝐃𝐒 • 𝟐𝟒/𝟕 𝐔𝐏𝐓𝐈𝐌𝐄.</b> 🔘 <b>𝐅𝐀𝐒𝐓</b>\n"
         f"🚀 <b>𝐋𝐀𝐆-𝐅𝐑𝐄𝐄.</b> 🎙 <b>𝐏𝐋𝐀𝐘 𝐀𝐔𝐃𝐈𝐎, 𝐕𝐈𝐃𝐄𝐎 & 𝐓𝐆 𝐅𝐈𝐋𝐄𝐒.</b></blockquote>\n\n"
